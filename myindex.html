@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head></head><body>
+    <p color="red">This is my P tag<br/>
+        <label for="message">Message to display:</label>
+    <input type="text" id="message" value="initial">
+    </p>
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <script>
+        const twitch = window.Twitch.ext;
+
+        twitch.onAuthorized(() => {
+            console.log("onAuthorized called client!");
+            if (twitch.configuration) {
+                console.log("also twitch.configuration!");
+                console.log(twitch.configuration);
+            }
+            // Load existing config
+            if (twitch.configuration.broadcaster) {
+                console.log("onAuthorized called w/ broadcaster!");
+                let newMsg = twitch.configuration.broadcaster.content;
+                console.log("got value from twitch: " + newMsg);
+                document.getElementById('message').value = newMsg;
+            }
+            console.log("End of onAuthorized");
+
+twitch.configuration.onChanged(function() {
+    console.log("inside onChanged");
+  // Checks if configuration is defined
+  if (twitch.configuration.broadcaster) {
+    try {
+      // Parsing the array saved in broadcaster content
+      var config = twitch.configuration.broadcaster.content;
+      console.log("Config: " + config);
+      // Checking the content is an object
+      if (typeof config === 'object') {
+        // Updating the value of the options array to be the content from config
+        
+        
+      } else {
+        console.log('Invalid config');
+      }
+    } catch (e) {
+      console.log('Invalid config');
+    }
+  }
+});
+
+        });
+
+        twitch.configuration.onChanged(function() {
+            console.log("This is the OUTSIDE onChanged!");
+  // Checks if configuration is defined
+  if (twitch.configuration.broadcaster) {
+    try {
+      // Parsing the array saved in broadcaster content
+      var config = twitch.configuration.broadcaster.content;
+      console.log("Config: ",config);
+      // Checking the content is an object
+      if (typeof config === 'object') {
+        // Updating the value of the options array to be the content from config
+        
+        
+      } else {
+        console.log('Invalid config');
+      }
+    } catch (e) {
+      console.log('Invalid config');
+    }
+  } else {
+    console.log("NOT broadcaster");
+  }
+  console.log("End of the OUTSIDE onChanged!");
+});
+
+window.Twitch.ext.listen('broadcast', (target, contentType, message) => {
+    console.log("Received message:", message);
+}
+
+);
+
+
+        function saveConfig() {
+            console.log("saveConfig called!");
+            const message = document.getElementById('message').value;
+            console.log("saving " + message);
+            twitch.configuration.set('broadcaster', '1.0', message);
+        }
+    </script>
+    
+</body></html>
