@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config</title>
+</head>
+<body>
+    <h1>Configuration</h1>
+    <label for="message">Message to display:</label>
+    <input type="text" id="message">
+    <button onclick="saveConfig()">Save</button>
+
+    <script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+    <script>
+        const twitch = window.Twitch.ext;
+
+        twitch.onAuthorized(() => {
+            console.log("onAuthorized called!");
+            // Load existing config
+            if (twitch.configuration.broadcaster) {
+                console.log("onAuthorized called w/ broadcaster!");
+                document.getElementById('message').value = twitch.configuration.broadcaster.content;
+            }
+        });
+
+        function saveConfig() {
+            console.log("saveConfig called!");
+            const message = JSON.stringify({message: document.getElementById('message').value});
+            console.log("saving " + message);
+            twitch.configuration.set('broadcaster', '1.0', message);
+
+            window.Twitch.ext.send('broadcast', 'application/json', message);
+        }
+
+        // onContext callback called when context of an extension is fired 
+twitch.onContext((context) => {
+  console.log("onContext:",context);
+});
+
+// when the config changes, update the panel! 
+twitch.configuration.onChanged(function(){
+  console.log("broadcaster:",twitch.configuration.broadcaster)
+  console.log("in onChanged")
+  if(twitch.configuration.broadcaster){
+    console.log("config exists")
+    try{
+      var config = JSON.parse(twitch.configuration.broadcaster.content)
+      //console.log(typeof config)
+      if(typeof config === "object"){
+        options = config
+        
+        console.log(options)
+      }else{
+        console.log('invalid config')
+      }
+    }catch(e){
+      console.log('invalid config')
+    }
+  }
+});
+    </script>
+</body>
+</html>
